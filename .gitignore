@@ -1,0 +1,5 @@
+daemon/
+*.log
+.DS_Store
+node_modules/
+iisnode/

@@ -1,0 +1,39 @@
+{
+  "name": "fuel-core",
+  "version": "1.0.0",
+  "description": "fuel project for Nathanon",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js",
+    "build": "babel index.js --out-file index-compiled.js",
+    "down": "",
+    "psql": "psql -U postgres -d nine"
+  },
+  "keywords": [
+    "fuel"
+  ],
+  "author": "Nine&Sydney",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/cli": "^7.23.4",
+    "axios": "^1.6.7",
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.6",
+    "dotenv": "^16.0.2",
+    "express": "^4.22.1",
+    "express-winston": "^4.2.0",
+    "jsonwebtoken": "^9.0.0",
+    "node-windows": "^1.0.0-beta.8",
+    "nodemon": "^2.0.22",
+    "pg": "^8.20.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.25.2",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.7",
+    "@babel/node": "^7.22.19",
+    "@babel/preset-env": "^7.23.7"
+  }
+}
