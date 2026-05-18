@@ -10,7 +10,7 @@ const sequelize = new Sequelize(
     define: {
       timestamps: false, //ส่วนตรงนี้ก็เป็นการตั้งค่าเพิ่มเติม
     },
-  }
+  },
 );
 
 /*const sequelize2 = new Sequelize(
@@ -34,7 +34,8 @@ db.sequelize = sequelize;
 // db2.sequelize = sequelize2;
 
 db.eassetUsers = require("./easset_user.model")(sequelize, Sequelize);
-// db.fuel = require("./fuel.model")(sequelize, Sequelize);
+db.asset_categories = require("./asset_categories.model")(sequelize, Sequelize);
+db.asset_items = require("./asset_items.model")(sequelize, Sequelize);
 // db.auth = require("./auth.model")(sequelize, Sequelize);
 // db.parts = require("./parts.model")(sequelize, Sequelize);
 // db.service = require("./service.model")(sequelize, Sequelize);

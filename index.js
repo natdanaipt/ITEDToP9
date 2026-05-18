@@ -13,9 +13,12 @@ const electric = require("./controllers/electric.controller");
 const water = require("./controllers/water.controller");
 const eassetUsers = require("./controllers/easset_users.controller");
 const assets = require("./controllers/assets.controller");
-const auditLog  = require("./controllers/audit_log.controller");
+const auditLog = require("./controllers/audit_log.controller");
 const inspection = require("./controllers/inspection.controller");
-
+const aircond = require("./controllers/aircond.controller");
+const itassets = require("./controllers/itassets.controller");
+const assetItems = require("./controllers/assetitems.controller");
+const asset_categories = require("./controllers/asset_categories.controller");
 
 const app = express();
 const PORT = 5000;
@@ -24,10 +27,10 @@ const pathApi = "/api";
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const allowedOrigins = [
-  "http://localhost:8080", 
-  "http://172.20.10.5:8080",        // dev (Vite)
+  "https://localhost:5173",
+  "http://127.0.0.1:5173", // dev (Vite)
   "https://app.ninenap.com", // production
-  "http://10.10.9.73"
+  "http://10.10.9.73",
 ];
 
 app.use(
@@ -42,15 +45,15 @@ app.use(
       "Accept",
       "Origin",
     ],
-  })
+  }),
 );
-
 
 // ✅ ตอบ OPTIONS request เอง (Safari ชอบ preflight ตรวจ)
 app.options("*", cors());
 
 const verifyToken = require("./middleware/verifyToken");
 const isAdmin = require("./middleware/isAdmin");
+const asset_categoriesModel = require("./models/asset_categories.model");
 
 db.sequelize
   .sync() //{ force: true } reset database on save
@@ -70,68 +73,55 @@ db.sequelize
 //     console.log("Failed to sync db_nine: " + err.message);
 //   });
 
-
+// testing api
 app.get(pathApi + "/", (req, res) => {
   res.json("Hasdasdasdasasd");
 });
 
+// customer api
 {
+  //fuel
   app.get(pathApi + "/users/get", users.findAll);
-  app.get(pathApi + "/easset/users",     eassetUsers.findAll);
+  app.get(pathApi + "/easset/users", eassetUsers.findAll);
   app.get(pathApi + "/easset/users/:id", eassetUsers.findOne);
-  app.get(pathApi + "/assets",       assets.findAll);   
-  app.get(pathApi + "/assets/:id",   assets.findOne);   
-  app.post(pathApi + "/assets",      assets.create);    
-  app.put(pathApi + "/assets/:id",   assets.update);   
-  app.delete(pathApi + "/assets/:id", assets.remove);   
+  app.get(pathApi + "/assets", assets.findAll); // ดึงทั้งหมด
+  app.get(pathApi + "/assets/:id", assets.findOne); // ดึงรายชิ้น
+  app.post(pathApi + "/assets", assets.create); // เพิ่มใหม่
+  app.put(pathApi + "/assets/:id", assets.update); // แก้ไข
+  app.delete(pathApi + "/assets/:id", assets.remove); // ลบ
 
-  app.get(pathApi + "/audit-logs",              auditLog.findAll);
+  app.get(pathApi + "/audit-logs", auditLog.findAll);
   app.get(pathApi + "/audit-logs/user/:userId", auditLog.findByUser);
 
-  app.get(pathApi + "/inspections",              inspection.findAll);
-  app.get(pathApi + "/inspections/year/:year",   inspection.findByYear);
-  app.get(pathApi + "/inspections/scan/:qr_co de",inspection.scanQR);
-  app.post(pathApi + "/inspections",             inspection.create);
-  // app.post(pathApi + "/get/fuel/sortdash/:uid/:carid",verifyToken ,fuel.getsortdash);
-  // app.post(pathApi + "/addfuel" + "/", verifyToken,fuel.create);
-  // app.delete(pathApi + "/deletefuel/:id/:uid",verifyToken, fuel.delete);
-  // app.get(pathApi + "/topfuel/:uid/:carid", fuel.topOne);
-  // app.post(pathApi + "/updatefuel/:id",verifyToken, fuel.update);
-  // //users
-  // app.get(pathApi + "/tct_bot", verifyToken,isAdmin,users.findAll);
-  // app.get(pathApi + "/tct_bot/:id", verifyToken,isAdmin,users.findOne);
-  // app.post(pathApi + "/login", auth.login);
-  // //parts
-  // app.get(pathApi + "/getparts/:uid/:carid",verifyToken, parts.findAll);
-  // app.post(pathApi + "/update/parts/:id",verifyToken, parts.update);
-  // app.post(pathApi + "/newparts", verifyToken,parts.create);
-  // app.delete(pathApi + "/delete/parts/:id",verifyToken, parts.delete);
+  app.get(pathApi + "/inspections", inspection.findAll);
+  app.get(pathApi + "/inspections/year/:year", inspection.findByYear);
+  app.get(pathApi + "/inspections/scan/:qr_code", inspection.scanQR);
+  app.post(pathApi + "/inspections", inspection.create);
 
-  // //services
-  // app.get(pathApi + "/getservice/:uid", verifyToken,service.findAll);
-  // app.get(pathApi + "/getserviceview/:uid",verifyToken, service.View);
-  // app.get(pathApi + "/getserviceviewbyid/:partId/:uid/:carid",verifyToken, service.ViewById);
-  // app.get(pathApi + "/getdashparts/:partId/:uid/:carid",verifyToken, service.findAllDash);
-  // app.post(pathApi + "/newservice",verifyToken, service.create);
-  // app.post(pathApi + "/update/service/:id", verifyToken,service.update);
-  // app.delete(pathApi + "/deleteservice" + "/:id", verifyToken,service.delete);
-  // //electric
-  // app.get(pathApi + "/get/electric/:uid", verifyToken,electric.findAll);
-  // app.get(pathApi + "/get/electricdash/:uid",verifyToken,electric.findYearDash);
-  // app.post(pathApi + "/add/electric",verifyToken, electric.create);
-  // app.delete(pathApi + "/delete/electric/:id/:uid",verifyToken, electric.delete);
-  // app.post(pathApi + "/update/electric/:id/:uid",verifyToken, electric.update);
-  // //water
-  // app.get(pathApi + "/get/water/:uid",verifyToken, water.findAll);
-  // app.get(pathApi + "/get/waterdash/:uid", verifyToken,water.findYearDash);
-  // app.post(pathApi + "/add/water", verifyToken,water.create);
-  // app.delete(pathApi + "/delete/water/:id/:uid",verifyToken, water.delete);
-  // app.post(pathApi + "/update/water/:id/:uid", verifyToken,water.update);
-  // //car
-  // app.get(pathApi + "/get/car/:uid",verifyToken, car.findAll);
-  // app.post(pathApi + "/add/car", verifyToken,car.create);
-  // app.post(pathApi + "/update/car/:id",verifyToken, car.update);
-  // app.delete(pathApi + "/delete/car/:id/:uid",verifyToken, car.delete);
+  // เครื่องปรับอากาศ
+  app.get(pathApi + "/aircond", aircond.findAll);
+  app.get(pathApi + "/aircond/summary", aircond.summary);
+  app.get(pathApi + "/aircond/floor/:floor", aircond.findByFloor);
+
+  // ครุภัณฑ์ IT
+  app.get(pathApi + "/itassets", itassets.findAll);
+  app.get(pathApi + "/itassets/summary", itassets.summary);
+  app.get(pathApi + "/itassets/search/:keyword", itassets.search);
+  app.get(pathApi + "/itassets/custodian/:name", itassets.findByCustodian);
+  app.get(pathApi + "/asset-items", assetItems.findAll);
+  app.get(pathApi + "/asset-items/problems", assetItems.findProblems);
+  app.get(pathApi + "/asset-items/search/:keyword", assetItems.search);
+  app.get(pathApi + "/asset-items/:id", assetItems.findOne);
+  app.post(pathApi + "/asset-items", assetItems.create);
+  app.put(pathApi + "/asset-items/:id", assetItems.update);
+  app.delete(pathApi + "/asset-items/:id", assetItems.remove);
+  app.post(pathApi + "/asset-items/test/:an", assetItems.test);
+
+  // asset_categories
+  app.get(pathApi + "/asset-cat/get", asset_categories.findAll);
+  app.post(pathApi + "/asset-cat", asset_categories.create);
+  app.put(pathApi + "/asset-cat/:id", asset_categories.update);
+  app.delete(pathApi + "/asset-cat/:id", asset_categories.remove);
 }
 
 // Run the server

@@ -1,12 +1,15 @@
+const { log } = require("winston");
 const db = require("../models");
 const { QueryTypes } = require("sequelize");
+const asset_items = db.asset_items;
 
 // ========================================
 // GET /api/assets — ดึงครุภัณฑ์ทั้งหมด
 // ========================================
 exports.findAll = async (req, res) => {
   try {
-    const assets = await db.sequelize.query(`
+    const assets = await db.sequelize.query(
+      `
       SELECT
         a.id,
         a.asset_id,
@@ -32,7 +35,9 @@ exports.findAll = async (req, res) => {
       LEFT JOIN users             u ON a.custodian_id = u.id
       LEFT JOIN departments       d ON a.department_id = d.id
       ORDER BY a.id ASC
-    `, { type: QueryTypes.SELECT });
+    `,
+      { type: QueryTypes.SELECT },
+    );
 
     return res.status(200).json({
       success: true,
@@ -50,7 +55,8 @@ exports.findAll = async (req, res) => {
 exports.findOne = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await db.sequelize.query(`
+    const result = await db.sequelize.query(
+      `
       SELECT
         a.*,
         ac.category_name_th  AS category,
@@ -64,10 +70,12 @@ exports.findOne = async (req, res) => {
       LEFT JOIN users             u ON a.custodian_id = u.id
       LEFT JOIN departments       d ON a.department_id = d.id
       WHERE a.id = :id
-    `, {
-      replacements: { id },
-      type: QueryTypes.SELECT,
-    });
+    `,
+      {
+        replacements: { id },
+        type: QueryTypes.SELECT,
+      },
+    );
 
     if (result.length === 0) {
       return res.status(404).json({ success: false, message: "ไม่พบครุภัณฑ์" });
@@ -82,59 +90,93 @@ exports.findOne = async (req, res) => {
 // ========================================
 // POST /api/assets — เพิ่มครุภัณฑ์ใหม่
 // ========================================
-exports.create = async (req, res) => {
-  try {
-    const {
-      asset_id, asset_id_old, asset_name, description,
-      unit, price_per_unit, quantity, category_id,
-      acquisition_type, acquisition_date, useful_life_years,
-      expiry_date, status, location_id, custodian_id,
-      photos, department_id, remark, created_by,
-    } = req.body;
+exports.create = (req, res) => {
+  console.log("+++++++++++++++++++++++++++++++++++++++++++++", req.body);
+  res.status(200).send();
+  // try {
+  //   const {
+  //     asset_id,
+  //     asset_id_old,
+  //     asset_name,
+  //     description,
+  //     unit,
+  //     price_per_unit,
+  //     quantity,
+  //     category_id,
+  //     acquisition_type,
+  //     acquisition_date,
+  //     useful_life_years,
+  //     expiry_date,
+  //     status,
+  //     location_id,
+  //     custodian_id,
+  //     photos,
+  //     department_id,
+  //     remark,
+  //     created_by,
+  //   } = req.body;
 
-    // เช็คว่า asset_id ซ้ำไหม
-    const existing = await db.sequelize.query(
-      `SELECT id FROM assets WHERE asset_id = :asset_id`,
-      { replacements: { asset_id }, type: QueryTypes.SELECT }
-    );
-    if (existing.length > 0) {
-      return res.status(400).json({ success: false, message: "รหัสครุภัณฑ์นี้มีอยู่แล้ว" });
-    }
+  //   // เช็คว่า asset_id ซ้ำไหม
 
-    await db.sequelize.query(`
-      INSERT INTO assets (
-        asset_id, asset_id_old, asset_name, description,
-        unit, price_per_unit, quantity, category_id,
-        acquisition_type, acquisition_date, useful_life_years,
-        expiry_date, status, location_id, custodian_id,
-        photos, department_id, remark, created_by,
-        data_updated_at, created_at, updated_at
-      ) VALUES (
-        :asset_id, :asset_id_old, :asset_name, :description,
-        :unit, :price_per_unit, :quantity, :category_id,
-        :acquisition_type, :acquisition_date, :useful_life_years,
-        :expiry_date, :status, :location_id, :custodian_id,
-        :photos, :department_id, :remark, :created_by,
-        NOW(), NOW(), NOW()
-      )
-    `, {
-      replacements: {
-        asset_id, asset_id_old, asset_name, description,
-        unit, price_per_unit, quantity: quantity || 1,
-        category_id, acquisition_type, acquisition_date,
-        useful_life_years, expiry_date,
-        status: status || "active",
-        location_id, custodian_id,
-        photos: JSON.stringify(photos || []),
-        department_id, remark, created_by,
-      },
-      type: QueryTypes.INSERT,
-    });
+  //   const existing = asset_items.findOne({
+  //     where: { asset_no_main: asset_id_old },
+  //   });
+  //   if (existing.length > 0) {
+  //     return res
+  //       .status(400)
+  //       .json({ success: false, message: "รหัสครุภัณฑ์นี้มีอยู่แล้ว" });
+  //   }
 
-    return res.status(201).json({ success: true, message: "เพิ่มครุภัณฑ์สำเร็จ" });
-  } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
-  }
+  //   db.sequelize.query(
+  //     `
+  //     INSERT INTO assets (
+  //       asset_id, asset_id_old, asset_name, description,
+  //       unit, price_per_unit, quantity, category_id,
+  //       acquisition_type, acquisition_date, useful_life_years,
+  //       expiry_date, status, location_id, custodian_id,
+  //       photos, department_id, remark, created_by,
+  //       data_updated_at, created_at, updated_at
+  //     ) VALUES (
+  //       :asset_id, :asset_id_old, :asset_name, :description,
+  //       :unit, :price_per_unit, :quantity, :category_id,
+  //       :acquisition_type, :acquisition_date, :useful_life_years,
+  //       :expiry_date, :status, :location_id, :custodian_id,
+  //       :photos, :department_id, :remark, :created_by,
+  //       NOW(), NOW(), NOW()
+  //     )
+  //   `,
+  //     {
+  //       replacements: {
+  //         asset_id,
+  //         asset_id_old: asset_id_old || null,
+  //         asset_name,
+  //         description,
+  //         unit,
+  //         price_per_unit: price_per_unit || null,
+  //         quantity: quantity || 1,
+  //         category_id,
+  //         acquisition_type,
+  //         acquisition_date,
+  //         useful_life_years,
+  //         expiry_date,
+  //         status: status || "active",
+  //         location_id,
+  //         custodian_id,
+  //         photos: JSON.stringify(photos || []),
+  //         department_id,
+  //         remark,
+  //         created_by,
+  //       },
+  //       type: QueryTypes.INSERT,
+  //     },
+  //   );
+
+  //   return res
+  //     .status(201)
+  //     .json({ success: true, message: "เพิ่มครุภัณฑ์สำเร็จ" });
+  // } catch (err) {
+  //   return res.status(500).json({ success: false, message: err.message });
+  // }
 };
 
 // ========================================
@@ -144,13 +186,25 @@ exports.update = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      asset_name, description, unit, price_per_unit,
-      quantity, category_id, acquisition_type, acquisition_date,
-      useful_life_years, expiry_date, status,
-      location_id, custodian_id, photos, remark,
+      asset_name,
+      description,
+      unit,
+      price_per_unit,
+      quantity,
+      category_id,
+      acquisition_type,
+      acquisition_date,
+      useful_life_years,
+      expiry_date,
+      status,
+      location_id,
+      custodian_id,
+      photos,
+      remark,
     } = req.body;
 
-    await db.sequelize.query(`
+    await db.sequelize.query(
+      `
       UPDATE assets SET
         asset_name       = :asset_name,
         description      = :description,
@@ -170,19 +224,33 @@ exports.update = async (req, res) => {
         data_updated_at  = NOW(),
         updated_at       = NOW()
       WHERE id = :id
-    `, {
-      replacements: {
-        id, asset_name, description, unit, price_per_unit,
-        quantity, category_id, acquisition_type, acquisition_date,
-        useful_life_years, expiry_date, status,
-        location_id, custodian_id,
-        photos: JSON.stringify(photos || []),
-        remark,
+    `,
+      {
+        replacements: {
+          id,
+          asset_name,
+          description,
+          unit,
+          price_per_unit: price_per_unit || null,
+          quantity: quantity || 1,
+          category_id: category_id || 1,
+          acquisition_type: acquisition_type || "ซื้อ",
+          acquisition_date: acquisition_date || null,
+          useful_life_years: useful_life_years || 5,
+          expiry_date: expiry_date || null,
+          status: status || "active",
+          location_id: location_id || 1,
+          custodian_id: custodian_id || 1,
+          photos: JSON.stringify(photos || []),
+          remark: remark || null,
+        },
+        type: QueryTypes.UPDATE,
       },
-      type: QueryTypes.UPDATE,
-    });
+    );
 
-    return res.status(200).json({ success: true, message: "แก้ไขครุภัณฑ์สำเร็จ" });
+    return res
+      .status(200)
+      .json({ success: true, message: "แก้ไขครุภัณฑ์สำเร็จ" });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -197,16 +265,16 @@ exports.remove = async (req, res) => {
 
     const existing = await db.sequelize.query(
       `SELECT id FROM assets WHERE id = :id`,
-      { replacements: { id }, type: QueryTypes.SELECT }
+      { replacements: { id }, type: QueryTypes.SELECT },
     );
     if (existing.length === 0) {
       return res.status(404).json({ success: false, message: "ไม่พบครุภัณฑ์" });
     }
 
-    await db.sequelize.query(
-      `DELETE FROM assets WHERE id = :id`,
-      { replacements: { id }, type: QueryTypes.DELETE }
-    );
+    await db.sequelize.query(`DELETE FROM assets WHERE id = :id`, {
+      replacements: { id },
+      type: QueryTypes.DELETE,
+    });
 
     return res.status(200).json({ success: true, message: "ลบครุภัณฑ์สำเร็จ" });
   } catch (err) {
