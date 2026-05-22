@@ -1,11 +1,11 @@
 const Sequelize = require("sequelize");
 
 const sequelize = new Sequelize(
-  "e_asset_db", // นี่เป็นชื่อ DB ของเราน
-  "postgres", // user ที่ใช้สรการเข้าไปยัง db
-  "P@ssw0rd", // password
+  process.env.DB_NAME, // นี่เป็นชื่อ DB ของเราน
+ process.env.DB_USER, // user ที่ใช้สรการเข้าไปยัง db
+  process.env.DB_PASSWORD, // password
   {
-    host: "localhost", // host ของ db ที่เราสร้างเอาไว้
+    host: process.env.DB_HOST, // host ของ db ที่เราสร้างเอาไว้
     dialect: "postgres", // 'mysql' | 'mariadb' | 'postgres' | 'mssql'   พวกนี้ใช่ก็ใช้ได้นะจ๊ะ
     define: {
       timestamps: false, //ส่วนตรงนี้ก็เป็นการตั้งค่าเพิ่มเติม
@@ -36,6 +36,7 @@ db.sequelize = sequelize;
 db.eassetUsers = require("./easset_user.model")(sequelize, Sequelize);
 db.asset_categories = require("./asset_categories.model")(sequelize, Sequelize);
 db.asset_items = require("./asset_items.model")(sequelize, Sequelize);
+db.users = require("./users.model")(sequelize, Sequelize);
 // db.auth = require("./auth.model")(sequelize, Sequelize);
 // db.parts = require("./parts.model")(sequelize, Sequelize);
 // db.service = require("./service.model")(sequelize, Sequelize);

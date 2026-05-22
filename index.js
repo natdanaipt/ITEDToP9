@@ -80,6 +80,8 @@ app.get(pathApi + "/", (req, res) => {
 
 // customer api
 {
+  //auth
+   app.post(pathApi + "/auth/kmutnbsso", auth.loginWithSSO);
   //fuel
   app.get(pathApi + "/users/get", users.findAll);
   app.get(pathApi + "/easset/users", eassetUsers.findAll);
