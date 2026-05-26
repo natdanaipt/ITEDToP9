@@ -233,7 +233,14 @@ const loginWithSSO = async (req, res) => {
     res.json({
       success: true,
       token: ourToken,
-      user: { username: user.sub, role: user.userType },
+      user: {
+        username: user.sub,
+        role: user.userType,
+        full_prefix_name_th: user.full_prefix_name_th,
+        firstname_th: user.firstname_th,
+        lastname_th: user.lastname_th,
+        photo: user.photo,
+      },
     });
   } catch (error) {
     console.error("SSO Process Error:", error);
